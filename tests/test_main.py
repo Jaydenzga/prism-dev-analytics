@@ -1,8 +1,10 @@
-import httpx
-from app import main
 
 from fastapi.testclient import TestClient
+
+from app import main
 from app.main import app
+from app.github_client import GitHubError
+
 
 client = TestClient(app)
 
@@ -19,19 +21,28 @@ def test_health():
 
 def test_repository_not_found(monkeypatch):
 
-    def fake_fetch_repository(owner, repo):
-        return httpx.Response(status_code=404)
+    class FakeGitHubClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+        async def repository(self, owner, repo):
+            raise GitHubError(
+                404,
+                "Repository not found or not publicly accessible."
+            )
 
     monkeypatch.setattr(
         main,
-        "fetch_repository",
-        fake_fetch_repository
+        "GitHubClient",
+        FakeGitHubClient
     )
 
     response = client.get("/repos/example/missing")
 
     assert response.status_code == 404
     assert response.json() == {
-        "detail": "Repository not found."
+        "detail": "Repository not found or not publicly accessible."
     }
-
