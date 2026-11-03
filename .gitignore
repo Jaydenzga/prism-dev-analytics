@@ -1,8 +1,14 @@
 .venv/
 __pycache__/
 *.pyc
-.env
-.env.*
-!.env.example
-.DS_Store
 .pytest_cache/
+.env
+.DS_Store
+# React dependencies and build output
+web/node_modules/
+web/dist/
+web/.vite/
+*.tsbuildinfo
+
+# Local database files
+data/
