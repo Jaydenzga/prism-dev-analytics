@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+data
+web/node_modules
+web/dist
+.env
+.env.*
+web/.vite
+*.tsbuildinfo
+*.pyc
